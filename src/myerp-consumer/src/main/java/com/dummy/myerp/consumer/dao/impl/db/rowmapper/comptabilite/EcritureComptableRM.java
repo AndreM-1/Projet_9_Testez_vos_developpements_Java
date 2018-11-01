@@ -17,9 +17,8 @@ public class EcritureComptableRM implements RowMapper<EcritureComptable> {
     /** JournalComptableDaoCache */
     private final JournalComptableDaoCache journalComptableDaoCache = new JournalComptableDaoCache();
 
-
     @Override
-    public EcritureComptable mapRow(ResultSet pRS, int pRowNum) throws SQLException {
+    public EcritureComptable mapRow(ResultSet pRS, int pRowNum) throws SQLException { 
         EcritureComptable vBean = new EcritureComptable();
         vBean.setId(pRS.getInt("id"));
         vBean.setJournal(journalComptableDaoCache.getByCode(pRS.getString("journal_code")));

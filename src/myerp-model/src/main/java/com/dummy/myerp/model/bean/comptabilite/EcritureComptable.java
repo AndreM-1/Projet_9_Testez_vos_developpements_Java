@@ -24,7 +24,10 @@ public class EcritureComptable {
     /** Journal comptable */
     @NotNull private JournalComptable journal;
     /** The Reference. */
-    @Pattern(regexp = "\\d{1,5}-\\d{4}/\\d{5}")
+    //Correction André Monnier : remplacement du pattern "\\d{1,5}-\\d{4}/\\d{5}" par "\\w{1,5}-\\d{4}/\\d{5}"
+    //et ajout de l'annotation @NotNull
+    @NotNull
+    @Pattern(regexp = "\\w{1,5}-\\d{4}/\\d{5}")
     private String reference;
     /** The Date. */
     @NotNull private Date date;
@@ -99,8 +102,9 @@ public class EcritureComptable {
     public BigDecimal getTotalCredit() {
         BigDecimal vRetour = BigDecimal.ZERO;
         for (LigneEcritureComptable vLigneEcritureComptable : listLigneEcriture) {
-            if (vLigneEcritureComptable.getDebit() != null) {
-                vRetour = vRetour.add(vLigneEcritureComptable.getDebit());
+        	//Correction André Monnier : Remplacement de la méthode getDebit() par la méthode getCredit().
+            if (vLigneEcritureComptable.getCredit() != null) {
+                vRetour = vRetour.add(vLigneEcritureComptable.getCredit());
             }
         }
         return vRetour;
@@ -111,7 +115,12 @@ public class EcritureComptable {
      * @return boolean
      */
     public boolean isEquilibree() {
-        boolean vRetour = this.getTotalDebit().equals(getTotalCredit());
+    	//Correction André Monnier : remplacement de la méthode equals par la méthode compareTo.
+    	//En effet, la méthode equals est une égalité en terme de valeur et d'échelle. 
+    	//Ainsi, avec cette méthode, 2.0 n'est pas égal à 2.00, ce qui est trop risqué.
+    	//On va donc utiliser la méthode compareTo, qui est juste une égalité en terme de valeur,
+    	//donc dans ce cas-là, 2.0 sera égal à 2.00.
+        boolean vRetour = this.getTotalDebit().compareTo(getTotalCredit())==0;
         return vRetour;
     }
 

@@ -1,6 +1,7 @@
 package com.dummy.myerp.business.impl.manager;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -31,7 +32,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
     /**
      * Instantiates a new Comptabilite manager.
      */
-    public ComptabiliteManagerImpl() {
+    public ComptabiliteManagerImpl() { 
     }
 
 
@@ -89,7 +90,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
 
     /**
      * Vérifie que l'Ecriture comptable respecte les règles de gestion unitaires,
-     * c'est à dire indépendemment du contexte (unicité de la référence, exercie comptable non cloturé...)
+     * c'est à dire indépendemment du contexte (unicité de la référence, exercice comptable non cloturé...)
      *
      * @param pEcritureComptable -
      * @throws FunctionalException Si l'Ecriture comptable ne respecte pas les règles de gestion
@@ -104,12 +105,6 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
                                               "L'écriture comptable ne respecte pas les contraintes de validation",
                                               vViolations));
         }
-
-        // ===== RG_Compta_2 : Pour qu'une écriture comptable soit valide, elle doit être équilibrée
-        if (!pEcritureComptable.isEquilibree()) {
-            throw new FunctionalException("L'écriture comptable n'est pas équilibrée.");
-        }
-
         // ===== RG_Compta_3 : une écriture comptable doit avoir au moins 2 lignes d'écriture (1 au débit, 1 au crédit)
         int vNbrCredit = 0;
         int vNbrDebit = 0;
@@ -124,16 +119,31 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
             }
         }
         // On test le nombre de lignes car si l'écriture à une seule ligne
-        //      avec un montant au débit et un montant au crédit ce n'est pas valable
+        // avec un montant au débit et un montant au crédit ce n'est pas valable
         if (pEcritureComptable.getListLigneEcriture().size() < 2
             || vNbrCredit < 1
             || vNbrDebit < 1) {
             throw new FunctionalException(
-                "L'écriture comptable doit avoir au moins deux lignes : une ligne au débit et une ligne au crédit.");
+                "RG_Compta_3 : Une écriture comptable doit contenir au moins deux lignes d'écriture: une au débit et une au crédit.");
+        }
+        
+        // ===== RG_Compta_2 : Pour qu'une écriture comptable soit valide, elle doit être équilibrée :
+        //la somme des montants au crédit des lignes d'écriture doit être égale à la somme des montants au débit.
+        if (!pEcritureComptable.isEquilibree()) {
+            throw new FunctionalException("RG_Compta_2 : L'écriture comptable n'est pas équilibrée.");
         }
 
-        // TODO ===== RG_Compta_5 : Format et contenu de la référence
-        // vérifier que l'année dans la référence correspond bien à la date de l'écriture, idem pour le code journal...
+        // ===== RG_Compta_5 : Format et contenu de la référence
+        if(!pEcritureComptable.getJournal().getCode().equals(pEcritureComptable.getReference().split("-")[0])) {
+        	  throw new FunctionalException("RG_Compta_5 : Erreur dans la référence au niveau du code journal.");
+        }
+        
+        Calendar vCalendar=Calendar.getInstance();
+        vCalendar.setTime(pEcritureComptable.getDate());
+
+        if(vCalendar.get(Calendar.YEAR)!=Integer.valueOf(pEcritureComptable.getReference().split("-")[1].split("/")[0])) {
+        	  throw new FunctionalException("RG_Compta_5 : Erreur dans la référence au niveau de l'année.");
+        }
     }
 
 
@@ -146,12 +156,12 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
      */
     protected void checkEcritureComptableContext(EcritureComptable pEcritureComptable) throws FunctionalException {
         // ===== RG_Compta_6 : La référence d'une écriture comptable doit être unique
-        if (StringUtils.isNoneEmpty(pEcritureComptable.getReference())) {
+        if (StringUtils.isNoneEmpty(pEcritureComptable.getReference())) { 
             try {
                 // Recherche d'une écriture ayant la même référence
                 EcritureComptable vECRef = getDaoProxy().getComptabiliteDao().getEcritureComptableByRef(
                     pEcritureComptable.getReference());
-
+              
                 // Si l'écriture à vérifier est une nouvelle écriture (id == null),
                 // ou si elle ne correspond pas à l'écriture trouvée (id != idECRef),
                 // c'est qu'il y a déjà une autre écriture avec la même référence

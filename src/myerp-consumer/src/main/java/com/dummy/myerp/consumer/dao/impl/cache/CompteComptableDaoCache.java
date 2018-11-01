@@ -15,7 +15,6 @@ public class CompteComptableDaoCache {
     /** The List compte comptable. */
     private List<CompteComptable> listCompteComptable;
 
-
     // ==================== Constructeurs ====================
     /**
      * Instantiates a new Compte comptable dao cache.

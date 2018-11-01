@@ -26,12 +26,6 @@ public class JournalComptable {
     // ==================== Constructeurs ====================
     /**
      * Instantiates a new Journal comptable.
-     */
-    public JournalComptable() {
-    }
-
-    /**
-     * Instantiates a new Journal comptable.
      *
      * @param pCode the p code
      * @param pLibelle the p libelle
@@ -78,12 +72,15 @@ public class JournalComptable {
      * @param pCode le code du {@link JournalComptable} à chercher
      * @return {@link JournalComptable} ou {@code null}
      */
-    public static JournalComptable getByCode(List<? extends JournalComptable> pList, String pCode) {
+    public static JournalComptable getByCode(List<? extends JournalComptable> pList, String pCode) { 
         JournalComptable vRetour = null;
-        for (JournalComptable vBean : pList) {
-            if (vBean != null && Objects.equals(vBean.getCode(), pCode)) {
-                vRetour = vBean;
-                break;
+        //Correction André Monnier : Ajout du test de nullité
+        if(pList!=null) {
+            for (JournalComptable vBean : pList) {
+                if (vBean != null && Objects.equals(vBean.getCode(), pCode)) {
+                    vRetour = vBean;
+                    break;
+                }
             }
         }
         return vRetour;

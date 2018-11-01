@@ -92,7 +92,7 @@ public abstract class AbstractDbConsumer {
      */
     public static void configure(Map<DataSourcesEnum, DataSource> pMapDataSource) {
         // On pilote l'ajout avec l'Enum et on ne rajoute pas tout à l'aveuglette...
-        //   ( pas de AbstractDbDao.mapDataSource.putAll(...) )
+        //   ( pas de AbstractDbDao.mapDataSource.putAll(...) ) 
         Map<DataSourcesEnum, DataSource> vMapDataSource = new HashMap<>(DataSourcesEnum.values().length);
         DataSourcesEnum[] vDataSourceIds = DataSourcesEnum.values();
         for (DataSourcesEnum vDataSourceId : vDataSourceIds) {

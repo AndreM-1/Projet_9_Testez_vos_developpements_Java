@@ -118,7 +118,7 @@ public class ComptabiliteDaoImpl extends AbstractDbConsumer implements Comptabil
         SQLgetEcritureComptableByRef = pSQLgetEcritureComptableByRef;
     }
     @Override
-    public EcritureComptable getEcritureComptableByRef(String pReference) throws NotFoundException {
+    public EcritureComptable getEcritureComptableByRef(String pReference) throws NotFoundException { 
         NamedParameterJdbcTemplate vJdbcTemplate = new NamedParameterJdbcTemplate(getDataSource(DataSourcesEnum.MYERP));
         MapSqlParameterSource vSqlParams = new MapSqlParameterSource();
         vSqlParams.addValue("reference", pReference);

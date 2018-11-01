@@ -24,7 +24,7 @@ public final class DaoProxyImpl implements DaoProxy {
      * @return {@link DaoProxyImpl}
      */
     protected static DaoProxyImpl getInstance() {
-        return DaoProxyImpl.INSTANCE;
+        return DaoProxyImpl.INSTANCE; 
     }
 
     /**

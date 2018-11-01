@@ -14,10 +14,8 @@ public class CompteComptableRM implements RowMapper<CompteComptable> {
 
     @Override
     public CompteComptable mapRow(ResultSet pRS, int pRowNum) throws SQLException {
-        CompteComptable vBean = new CompteComptable();
-        vBean.setNumero(pRS.getInt("numero"));
-        vBean.setLibelle(pRS.getString("libelle"));
-
-        return vBean;
-    }
+    	//Correction André Monnier : Mise à jour et simplification du code.
+        CompteComptable vBean = new CompteComptable(pRS.getInt("numero"),pRS.getString("libelle")); 
+        return vBean; 
+    } 
 }
