@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.dummy.myerp.consumer.ConsumerHelper;
 import com.dummy.myerp.consumer.dao.contrat.DaoProxy;
+import com.dummy.myerp.technical.exception.TechnicalException;
 
 
 /**
@@ -54,7 +55,8 @@ public abstract class AbstractDbConsumer {
      * @return SimpleJdbcTemplate
      */
     protected DataSource getDataSource(DataSourcesEnum pDataSourceId) {
-        DataSource vRetour = this.mapDataSource.get(pDataSourceId);
+    	//Correction André Monnier : remplacement de this.mapDataSource par mapDataSource.
+        DataSource vRetour = mapDataSource.get(pDataSourceId);
         if (vRetour == null) {
             throw new UnsatisfiedLinkError("La DataSource suivante n'a pas été initialisée : " + pDataSourceId);
         }
@@ -89,20 +91,27 @@ public abstract class AbstractDbConsumer {
      * Méthode de configuration de la classe
      *
      * @param pMapDataSource -
+     * @throws TechnicalException 
      */
-    public static void configure(Map<DataSourcesEnum, DataSource> pMapDataSource) {
-        // On pilote l'ajout avec l'Enum et on ne rajoute pas tout à l'aveuglette...
+    public static void configure(Map<DataSourcesEnum, DataSource> pMapDataSource) throws TechnicalException {
+        
+    	//Correction André Monnier : si la map en entrée est null ou vide, on lève une erreur technique.
+    	if(pMapDataSource==null || pMapDataSource.isEmpty()) {
+    		throw new TechnicalException("Erreur Technique : l'objet Map<DataSourcesEnum, DataSource> pMapDataSource est null ou vide");
+    	}
+    	
+    	// On pilote l'ajout avec l'Enum et on ne rajoute pas tout à l'aveuglette...
         //   ( pas de AbstractDbDao.mapDataSource.putAll(...) ) 
         Map<DataSourcesEnum, DataSource> vMapDataSource = new HashMap<>(DataSourcesEnum.values().length);
         DataSourcesEnum[] vDataSourceIds = DataSourcesEnum.values();
         for (DataSourcesEnum vDataSourceId : vDataSourceIds) {
             DataSource vDataSource = pMapDataSource.get(vDataSourceId);
             // On test si la DataSource est configurée
-            // (NB : elle est considérée comme configurée si elle est dans pMapDataSource mais à null)
             if (vDataSource == null) {
-                if (!pMapDataSource.containsKey(vDataSourceId)) {
-                    LOGGER.error("La DataSource " + vDataSourceId + " n'a pas été initialisée !");
-                }
+            	//Correction André Monnier : suppression de la condition sur la clé : if(!pMapDataSource.containsKey(vDataSourceId))
+            	//et on lève une erreur technique dans le cas où la DataSource n'a pas été initialisée. 
+                LOGGER.error("La DataSource " + vDataSourceId + " n'a pas été initialisée !");
+                throw new TechnicalException ("La DataSource " + vDataSourceId + " n'a pas été initialisée !");       
             } else {
                 vMapDataSource.put(vDataSourceId, vDataSource);
             }
