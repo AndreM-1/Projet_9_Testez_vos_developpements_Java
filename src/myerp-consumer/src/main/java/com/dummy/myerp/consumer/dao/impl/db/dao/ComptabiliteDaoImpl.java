@@ -157,7 +157,16 @@ public class ComptabiliteDaoImpl extends AbstractDbConsumer implements Comptabil
     public void setSQLinsertEcritureComptable(String pSQLinsertEcritureComptable) {
         SQLinsertEcritureComptable = pSQLinsertEcritureComptable;
     }
-    @Override
+    
+    /** Correction André Monnier : 
+     * Ajout d'un setter pour le SGBDR à choisir : PostgreSQL pour la production / H2 pour les tests 
+     */
+    private static String sgbdr;
+	public static void setSgbdr(String pSgbdr) {
+		sgbdr = pSgbdr;
+	}
+
+	@Override
     public void insertEcritureComptable(EcritureComptable pEcritureComptable) {
         // ===== Ecriture Comptable
         NamedParameterJdbcTemplate vJdbcTemplate = new NamedParameterJdbcTemplate(getDataSource(DataSourcesEnum.MYERP));
@@ -166,14 +175,20 @@ public class ComptabiliteDaoImpl extends AbstractDbConsumer implements Comptabil
         vSqlParams.addValue("reference", pEcritureComptable.getReference());
         vSqlParams.addValue("date", pEcritureComptable.getDate(), Types.DATE);
         vSqlParams.addValue("libelle", pEcritureComptable.getLibelle());
+        
+        //Correction André Monnier : suivant le SGBDR choisi, les actions effectuées ne sont pas les mêmes.
+        if(sgbdr.equals("postgresql")) {
+        	vJdbcTemplate.update(SQLinsertEcritureComptable, vSqlParams);
 
-        vJdbcTemplate.update(SQLinsertEcritureComptable, vSqlParams);
-
-        // ----- Récupération de l'id
-        Integer vId = this.queryGetSequenceValuePostgreSQL(DataSourcesEnum.MYERP, "myerp.ecriture_comptable_id_seq",
-                                                           Integer.class);
-        pEcritureComptable.setId(vId);
-
+            // ----- Récupération de l'id
+            Integer vId = this.queryGetSequenceValuePostgreSQL(DataSourcesEnum.MYERP, "myerp.ecriture_comptable_id_seq",
+                                                               Integer.class);
+            pEcritureComptable.setId(vId);
+        }else if(sgbdr.equals("H2")){
+        	vSqlParams.addValue("id", pEcritureComptable.getId());
+        	vJdbcTemplate.update(SQLinsertEcritureComptable, vSqlParams); 
+        }
+        
         // ===== Liste des lignes d'écriture
         this.insertListLigneEcritureComptable(pEcritureComptable);
     }
@@ -191,7 +206,7 @@ public class ComptabiliteDaoImpl extends AbstractDbConsumer implements Comptabil
         NamedParameterJdbcTemplate vJdbcTemplate = new NamedParameterJdbcTemplate(getDataSource(DataSourcesEnum.MYERP));
         MapSqlParameterSource vSqlParams = new MapSqlParameterSource();
         vSqlParams.addValue("ecriture_id", pEcritureComptable.getId());
-
+    
         int vLigneId = 0;
         for (LigneEcritureComptable vLigne : pEcritureComptable.getListLigneEcriture()) {
             vLigneId++;
@@ -199,9 +214,7 @@ public class ComptabiliteDaoImpl extends AbstractDbConsumer implements Comptabil
             vSqlParams.addValue("compte_comptable_numero", vLigne.getCompteComptable().getNumero());
             vSqlParams.addValue("libelle", vLigne.getLibelle());
             vSqlParams.addValue("debit", vLigne.getDebit());
-
             vSqlParams.addValue("credit", vLigne.getCredit());
-
             vJdbcTemplate.update(SQLinsertListLigneEcritureComptable, vSqlParams);
         }
     }

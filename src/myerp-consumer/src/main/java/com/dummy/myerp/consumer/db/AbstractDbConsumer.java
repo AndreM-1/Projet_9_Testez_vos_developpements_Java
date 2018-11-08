@@ -2,6 +2,7 @@ package com.dummy.myerp.consumer.db;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.apache.logging.log4j.LogManager;
@@ -77,11 +78,11 @@ public abstract class AbstractDbConsumer {
      */
     protected <T> T queryGetSequenceValuePostgreSQL(DataSourcesEnum pDataSourcesId,
                                                     String pSeqName, Class<T> pSeqValueClass) {
-
+    	
         JdbcTemplate vJdbcTemplate = new JdbcTemplate(getDataSource(pDataSourcesId));
         String vSeqSQL = "SELECT last_value FROM " + pSeqName;
         T vSeqValue = vJdbcTemplate.queryForObject(vSeqSQL, pSeqValueClass);
-
+    	
         return vSeqValue;
     }
 
