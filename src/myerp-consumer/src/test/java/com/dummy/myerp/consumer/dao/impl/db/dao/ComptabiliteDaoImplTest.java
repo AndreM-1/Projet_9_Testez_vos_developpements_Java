@@ -33,6 +33,7 @@ import com.dummy.myerp.model.bean.comptabilite.CompteComptable;
 import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
 import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
 import com.dummy.myerp.model.bean.comptabilite.LigneEcritureComptable;
+import com.dummy.myerp.model.bean.comptabilite.SequenceEcritureComptable;
 import com.dummy.myerp.technical.exception.NotFoundException;
 
 /**
@@ -430,11 +431,11 @@ public class ComptabiliteDaoImplTest {
 		//On récupère le bean EcritureComptable que l'on souhaite mettre à jour.
 		//On évite de récupérer le bean EcritureComptable d'id=-6 car JUnit ne garantit pas l'ordre d'exécution des méthodes de tests.
 		EcritureComptable vEcritureComptableExpected=comptabiliteDaoImpl.getEcritureComptable(-1);
-		
+
 		//On modifie les attributs du bean récupéré.
 		vEcritureComptableExpected.setJournal(new JournalComptable("BQ", "Banque"));
 		vEcritureComptableExpected.setReference("BQ-2018/00001");
-		
+
 		//Pour la date, on passe par l'objet Calendar.
 		Calendar vCalendar = Calendar.getInstance();
 		//On met la date souhaitée dans le Calendar. Attention, la numérotation du mois commence à 0.
@@ -442,21 +443,21 @@ public class ComptabiliteDaoImplTest {
 		vCalendar.set(2018, 10, 15);
 		vEcritureComptableExpected.setDate(vCalendar.getTime());
 		vEcritureComptableExpected.setLibelle("Banque.");
-		
+
 		//On fait appel à la méthode que l'on veut tester.
 		comptabiliteDaoImpl.updateEcritureComptable(vEcritureComptableExpected);
-		
+
 		//On fait plusieurs vérifications pour voir si l'update du bean EcritureComptable en base de données a bien réussi.
 		//On vérifie que l'on arrive bien à récupérer l'EcritureComptable modifié à partir de son id ou de sa référence.
 		EcritureComptable ecritureComptableBDDEmbarqueById=comptabiliteDaoImpl.getEcritureComptable(vEcritureComptableExpected.getId());
 		EcritureComptable ecritureComptableBDDEmbarqueByRef=comptabiliteDaoImpl.getEcritureComptableByRef(vEcritureComptableExpected.getReference());
-		
+
 		ecritureComptableExpected=vEcritureComptableExpected;
-		
+
 		assertTrue("L'EcritureComptable attendu n'a pa été trouvée",testEgalite(ecritureComptableBDDEmbarqueById));
 		assertTrue("L'EcritureComptable attendu n'a pa été trouvée",testEgalite(ecritureComptableBDDEmbarqueByRef));
 	}
-	
+
 	/**
 	 * Test de la méthode deleteEcritureComptable(Integer pId)
 	 * @throws Exception 
@@ -466,12 +467,71 @@ public class ComptabiliteDaoImplTest {
 		//On fait appel à la méthode que l'on veut tester.
 		//On va supprimer l'EcritureComptable d'id=-5.
 		comptabiliteDaoImpl.deleteEcritureComptable(-5);
-		
+
 		tailleListEcritureComptableBDD-=1;
-		
+
 		//Ensuite, on essaie de récupérer l'EcritureComptable que l'on a supprimée.
 		//On s'attend à lever une NotFoundException.
-		comptabiliteDaoImpl.getEcritureComptable(-5);
+		comptabiliteDaoImpl.getEcritureComptable(-5);	
+	} 
+
+	/**
+	 * Test de la méthode getSequenceEcritureComptable(String pCodeJournal, Integer pAnnee)
+	 * On s'attend à retrouver un bean SequenceEcritureComptable.
+	 * @throws Exception 
+	 */
+	@Test
+	public void getSequenceEcritureComptableCase1() throws Exception {
+		SequenceEcritureComptable vSequenceEcritureComptableExpected = new SequenceEcritureComptable(2016,51);
+		SequenceEcritureComptable seqEcritureComptableBDDEmbarque= comptabiliteDaoImpl.getSequenceEcritureComptable("BQ", 2016);
+
+		boolean bResult=seqEcritureComptableBDDEmbarque.getAnnee().equals(vSequenceEcritureComptableExpected.getAnnee())
+				&&seqEcritureComptableBDDEmbarque.getDerniereValeur().equals(vSequenceEcritureComptableExpected.getDerniereValeur());
+
+		assertTrue("Le bean SequenceEcritureComptable attendu n'a pa été trouvé",bResult);
+	}
+	
+	/**
+	 * Test de la méthode getSequenceEcritureComptable(String pCodeJournal, Integer pAnnee) avec un couple (journalCode, annee)
+	 * qui ne figure pas dans le jeu de données de démos. On s'attend à lever une exception de type NotFoundException.
+	 * @throws Exception
+	 */
+	@Test(expected = NotFoundException.class)
+	public void getSequenceEcritureComptableCase2() throws Exception {
+		comptabiliteDaoImpl.getSequenceEcritureComptable("AC", 2030);  
+	}
+	
+	/**
+	 * Test de la méthode insertSequenceEcritureComptable(String pCodeJournal, SequenceEcritureComptable pSequenceEcritureComptable)
+	 * @throws Exception 
+	 */
+	@Test
+	public void insertSequenceEcritureComptable() throws Exception {
+		SequenceEcritureComptable vSequenceEcritureComptableExpected=new SequenceEcritureComptable(2018,1);
+		comptabiliteDaoImpl.insertSequenceEcritureComptable("AC", vSequenceEcritureComptableExpected); 
 		
+		SequenceEcritureComptable seqEcritureComptableBDDEmbarque=comptabiliteDaoImpl.getSequenceEcritureComptable("AC", vSequenceEcritureComptableExpected.getAnnee());
+		
+		boolean bResult=seqEcritureComptableBDDEmbarque.getAnnee().equals(vSequenceEcritureComptableExpected.getAnnee())
+				&&seqEcritureComptableBDDEmbarque.getDerniereValeur().equals(vSequenceEcritureComptableExpected.getDerniereValeur());
+		
+		assertTrue("Erreur lors de l'ajout de la SequenceEcritureComptable en base de données. ",bResult);
+	}
+	
+	/**
+	 * Test de la méthode updateSequenceEcritureComptable (String pCodeJournal, SequenceEcritureComptable pSequenceEcritureComptable)
+	 * @throws Exception 
+	 */
+	@Test
+	public void updateSequenceEcritureComptable() throws Exception {
+		SequenceEcritureComptable vSequenceEcritureComptableExpected=new SequenceEcritureComptable(2016,42);
+		comptabiliteDaoImpl.updateSequenceEcritureComptable("VE", vSequenceEcritureComptableExpected);
+		
+		SequenceEcritureComptable seqEcritureComptableBDDEmbarque=comptabiliteDaoImpl.getSequenceEcritureComptable("VE",vSequenceEcritureComptableExpected.getAnnee());
+		
+		boolean bResult=seqEcritureComptableBDDEmbarque.getAnnee().equals(vSequenceEcritureComptableExpected.getAnnee())
+				&&seqEcritureComptableBDDEmbarque.getDerniereValeur().equals(vSequenceEcritureComptableExpected.getDerniereValeur());
+		
+		assertTrue("Erreur lors de l'update de la SequenceEcritureComptable en base de données. ",bResult);
 	}
 }	

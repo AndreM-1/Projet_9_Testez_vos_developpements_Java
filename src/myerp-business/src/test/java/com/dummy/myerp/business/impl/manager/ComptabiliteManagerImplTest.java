@@ -5,6 +5,8 @@ import java.util.Date;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +19,7 @@ import com.dummy.myerp.model.bean.comptabilite.CompteComptable;
 import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
 import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
 import com.dummy.myerp.model.bean.comptabilite.LigneEcritureComptable;
+import com.dummy.myerp.model.bean.comptabilite.SequenceEcritureComptable;
 import com.dummy.myerp.technical.exception.FunctionalException;
 import com.dummy.myerp.technical.exception.NotFoundException;
 
@@ -41,6 +44,50 @@ public class ComptabiliteManagerImplTest {
 	public static void setUpBeforeClass() throws Exception {
 		AbstractBusinessManager.configure(businessProxyMock, daoProxyMock, transactionManagerMock);
 		when(daoProxyMock.getComptabiliteDao()).thenReturn(comptabiliteDaoMock);
+	}
+	
+	/**
+	 * Test de la méthode addReference(EcritureComptable pEcritureComptable) dans le cas
+	 * d'une séquence d'écriture comptable qui existe déjà.
+	 * @throws Exception 
+	 */
+	@Test
+	public void addReferenceCase1() throws Exception {
+		EcritureComptable vEcritureComptable=new EcritureComptable();
+		vEcritureComptable.setJournal(new JournalComptable("BQ", "Banque"));
+		vEcritureComptable.setDate(new Date());
+		vEcritureComptable.setLibelle("Libelle");
+		vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1,"testLibelle"),
+				null,new BigDecimal(123),null));
+		vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2,"testLibelle"),
+				null, null,new BigDecimal(123)));
+		
+		String referenceExpected="BQ-2018/00100";
+		when(comptabiliteDaoMock.getSequenceEcritureComptable("BQ", 2018)).thenReturn(new SequenceEcritureComptable(2018,99));
+		manager.addReference(vEcritureComptable); 	
+		assertEquals("La référence de l'écriture comptable n'a pas été mise à jour correctement.",referenceExpected,vEcritureComptable.getReference());
+	}
+	
+	/**
+	 * Test de la méthode addReference(EcritureComptable pEcritureComptable) dans le cas
+	 * d'une nouvelle séquence d'écriture comptable.
+	 * @throws Exception 
+	 */
+	@Test
+	public void addReferenceCase2() throws Exception{
+		EcritureComptable vEcritureComptable=new EcritureComptable();
+		vEcritureComptable.setJournal(new JournalComptable("OD", "Opérations Diverses"));
+		vEcritureComptable.setDate(new Date());
+		vEcritureComptable.setLibelle("Libelle");
+		vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1,"testLibelle"),
+				null,new BigDecimal(123),null));
+		vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2,"testLibelle"),
+				null, null,new BigDecimal(123)));
+		
+		String referenceExpected="OD-2018/00001";
+		when(comptabiliteDaoMock.getSequenceEcritureComptable("OD", 2018)).thenThrow(NotFoundException.class);
+		manager.addReference(vEcritureComptable); 
+		assertEquals("La référence de l'écriture comptable n'a pas été mise à jour correctement.",referenceExpected,vEcritureComptable.getReference());
 	}
 
 	/**
