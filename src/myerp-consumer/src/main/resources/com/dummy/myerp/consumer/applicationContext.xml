@@ -12,7 +12,9 @@
         <property name="targetMethod" value="configure"/>
         <property name="arguments">
             <map>
-                <entry value-ref="dataSourceMYERP">
+            	<!-- Correction André Monnier : ATTENTION A BIEN UTILISER LA DATASOURCE POUR LES TESTS QUI EST DEFINI
+            	DANS LE MODULE BUSINESS ET QUI EST UTILISE PAR LE PlatformTransactionManager POUR LE CONTEXTE TRANSACTIONNEL -->
+                <entry value-ref="dataSourceTest">
                     <key>
                         <value type="com.dummy.myerp.consumer.db.DataSourcesEnum">MYERP</value>
                     </key>

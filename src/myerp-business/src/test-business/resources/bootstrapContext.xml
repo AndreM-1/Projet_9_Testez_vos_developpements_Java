@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Configuration de la dataSource. -->
+
+    <!-- Chargement du fichier properties contenant la configuration de la datasource vers db_myerp  -->
+    <bean id="dataSourceTestConfiguration" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="location" value="classpath:/db-myerp.properties"/>
+    </bean>
+
+    <!-- Création de la datasource "dataSourceTest" -->
+    <bean id="dataSourceTest"
+          class="org.apache.commons.dbcp2.BasicDataSourceFactory"
+          factory-method="createDataSource"
+          destroy-method="close">
+        <constructor-arg ref="dataSourceTestConfiguration"/>
+    </bean>
+    
+   	<!-- Inclusion d'autres fichiers de contexte Spring des modules business et consumer-->
+   	<import resource="classpath:/com/dummy/myerp/consumer/applicationContext.xml" />
+	<import resource="classpath:/com/dummy/myerp/business/applicationContext.xml" />
+	
+</beans>
