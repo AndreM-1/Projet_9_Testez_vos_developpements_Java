@@ -283,7 +283,8 @@ public class TestIntegration extends BusinessTestCase {
 				ecritureComptableBDD = ecritureComptable;
 			}
 		}
-		assertTrue("L'EcritureComptable attendu n'a pa été trouvée",testEgalite(ecritureComptableBDD));	
+		
+		assertTrue("L'EcritureComptable attendu n'a pa été trouvée",testEgalite(ecritureComptableBDD));	 
 	}
 	
 	/**
