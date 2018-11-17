@@ -14,7 +14,7 @@
 
 
     <!-- PlatformTransactionManager pour le DataSource MYERP -->
-    <!-- Correction André Monnier : dataSourceMYERP fait référence à un bean dataSourceMYERP configuré dans le module consumer et qui est lié
+    <!-- Modification André Monnier : dataSourceMYERP fait référence à un bean dataSourceMYERP configuré dans le module consumer et qui est lié
     à la classe com.dummy.myerp.technical.util.spring.NullFactoryBean dont je ne sais pas me servir. J'ai donc remplacé dataSourceMYERP par 
     dataSourceTest qui est configurée dans le fichier src/test-business/resources/bootstrapContext.xml-->
     <bean id="txManagerMYERP" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

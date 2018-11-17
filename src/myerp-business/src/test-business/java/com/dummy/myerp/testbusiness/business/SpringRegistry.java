@@ -1,5 +1,7 @@
 package com.dummy.myerp.testbusiness.business;
 
+import javax.sql.DataSource;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -22,7 +24,7 @@ public final class SpringRegistry {
 
 
     /** Nom des fichiers de contexte de l'application */
-    //Correction André Monnier : le fichier bootstrapContext.xml sera mis au niveau du package src/test-business/resources
+    //Modification André Monnier : le fichier bootstrapContext.xml sera mis au niveau du package src/test-business/resources
     //comme suggéré dans le POM.xml
     private static final String CONTEXT_APPLI_LOCATION = "classpath:/bootstrapContext.xml";
 
@@ -93,5 +95,13 @@ public final class SpringRegistry {
      */
     public static TransactionManager getTransactionManager() {
         return (TransactionManager) SpringRegistry.getBean("TransactionManager");
+    }
+    
+    /**
+     * Renvoie l'instance de {@link DataSource} de l'application
+     * @return {@link DataSource}
+     */
+    public static DataSource getDataSourceTest() {
+    	return (DataSource) SpringRegistry.getBean("dataSourceTest");
     }
 }

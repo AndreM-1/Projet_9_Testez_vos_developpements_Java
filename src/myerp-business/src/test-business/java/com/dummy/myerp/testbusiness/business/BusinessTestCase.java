@@ -1,6 +1,8 @@
 package com.dummy.myerp.testbusiness.business;
 
 
+import javax.sql.DataSource;
+
 import com.dummy.myerp.business.contrat.BusinessProxy;
 import com.dummy.myerp.business.impl.TransactionManager;
 
@@ -18,6 +20,8 @@ public abstract class BusinessTestCase {
     private static final BusinessProxy BUSINESS_PROXY = SpringRegistry.getBusinessProxy();
     /** {@link TransactionManager} */
     private static final TransactionManager TRANSACTION_MANAGER = SpringRegistry.getTransactionManager();
+    /** {@link DataSource} */
+    private static final DataSource DATA_SOURCE_TEST = SpringRegistry.getDataSourceTest();
 
 
     // ==================== Constructeurs ====================
@@ -36,4 +40,8 @@ public abstract class BusinessTestCase {
     public static TransactionManager getTransactionManager() {
         return TRANSACTION_MANAGER;
     }
+
+	public static DataSource getDataSourceTest() {
+		return DATA_SOURCE_TEST;
+	}
 }
