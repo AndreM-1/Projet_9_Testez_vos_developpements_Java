@@ -1,8 +1,14 @@
 language: java
 jdk:
   - oraclejdk8
-sudo: enabled
+sudo: required
+services:
+  - docker
+before_install:
+  - cd docker/dev
+  - docker-compose up
+  - docker ps -a
 before_script:
-  - cd src/
+  - cd ../../src/
 script:
   - mvn clean test -Ptest-business
