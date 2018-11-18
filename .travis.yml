@@ -6,9 +6,10 @@ services:
   - docker
 before_install:
   - cd docker/dev
-  - docker-compose up
+  - docker-compose up -d
   - docker ps -a
 before_script:
   - cd ../../src/
 script:
-  - mvn clean test -Ptest-business
+  - mvn test
+  - mvn test -Ptest-business
