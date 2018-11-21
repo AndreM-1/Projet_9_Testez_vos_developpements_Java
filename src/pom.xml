@@ -15,7 +15,7 @@
     <!-- ===== General information ===== -->
     <name>MyERP</name>
     <description>
-        ERP sur-mesure pour Dummy...
+        L'application développée ici est un système de facturation et de comptabilité pour un client. Il s'agit d'un projet multi-modules, comprenant les modules indiquées ci-dessous.
     </description>
     <url>http://www.dummy.com/projects/myerp</url>
 
@@ -27,13 +27,14 @@
 
 
     <!-- =============================================================== -->
-    <!-- Distrubution management -->
+    <!-- Distribution management : Commentaire André Monnier : Dans notre
+      cas, ne surtout pas définir de section <distributionManagement> dans les 
+     sous-modules -->
     <!-- =============================================================== -->
     <distributionManagement>
         <site>
             <id>site</id>
-            <name>site-doc</name>
-            <url>file://${project.build.directory}/site-doc/</url>
+            <url>scp://localhost/tmp/</url>
         </site>
     </distributionManagement>
 
@@ -53,6 +54,7 @@
         <!-- ===== Version properties ===== -->
         <log4j.version>2.8.1</log4j.version>
         <spring.version>4.3.7.RELEASE</spring.version>
+        <main.basedir>${project.basedir}</main.basedir>
     </properties>
 
 
@@ -94,23 +96,6 @@
             <id>test-consumer</id>
         </profile>
     </profiles>
-
-
-    <!-- =============================================================== -->
-    <!-- Repositories -->
-    <!-- =============================================================== -->
-    <repositories>
-        <!-- ===== Project local repository ===== -->
-        <repository>
-            <id>project.local</id>
-            <name>project.local</name>
-            <url>file://${basedir}/../src/lib/</url>
-            <releases>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-        </repository>
-    </repositories>
-
 
     <!-- =============================================================== -->
     <!-- Dependency managment -->
@@ -364,7 +349,7 @@
                     <artifactId>maven-site-plugin</artifactId>
                     <version>3.6</version>
                     <inherited>true</inherited>
-                    <configuration>
+                    <configuration>             	
                         <locales>fr</locales>
                         <relativizeDecorationLinks>false</relativizeDecorationLinks>
                     </configuration>
@@ -401,7 +386,6 @@
     <!-- =============================================================== -->
     <reporting>
         <excludeDefaults>true</excludeDefaults>
-        <outputDirectory>${project.build.directory}/site</outputDirectory>
         <plugins>
             <!-- ===== Génération du site de documentation de base avec les "rapports génériques" ===== -->
             <plugin>
@@ -419,9 +403,9 @@
                             <report>license</report>
                             <report>modules</report>
                             <report>dependencies</report>
-                            <report>dependency-convergence</report>
-                            <report>dependency-management</report>
-                            <report>plugin-management</report>
+                            <!--<report>dependency-convergence</report>--> 
+                            <!--<report>dependency-management</report>-->
+                            <!--<report>plugin-management</report>-->
                             <report>plugins</report>
                             <report>project-team</report>
                             <report>scm</report>
@@ -439,26 +423,31 @@
                     <linkXRef>false</linkXRef>
                 </configuration>
                 <reportSets>
-                    <!-- reportSet par défaut, exécuté dans tous les modules (non-aggregate reports) -->
                     <reportSet>
+                        <!-- reportSet d'agrégation des rapports des sous-modules -->
+                        <id>aggregate</id>
                         <reports>
                             <!-- goal "report-only" afin de ne pas relancer les tests unitaires
                                  car normalement ils ont été lancés par la phase compile -->
                             <report>report-only</report>
                         </reports>
-                    </reportSet>
-                    <reportSet>
-                        <!-- reportSet d'agrégation des rapports des sous-modules -->
-                        <id>aggregate</id>
                         <!-- don't run aggregate in child modules -->
                         <inherited>false</inherited>
+                        <configuration>
+                            <aggregate>true</aggregate>
+                        </configuration>
+                    </reportSet>
+                   	<!-- reportSet par défaut, exécuté dans tous les modules (non-aggregate reports) -->
+                    <reportSet>
+                    	<id>modules</id>
+                    	<inherited>true</inherited>
                         <reports>
                             <!-- goal "report-only" afin de ne pas relancer les tests unitaires
                                  car normalement ils ont été lancés par la phase compile -->
                             <report>report-only</report>
                         </reports>
                         <configuration>
-                            <aggregate>true</aggregate>
+                        	<aggregate>false</aggregate>
                         </configuration>
                     </reportSet>
                 </reportSets>
@@ -507,8 +496,8 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.17</version>
                 <configuration>
-                    <configLocation>src/build/checkstyle.xml</configLocation>
                     <linkXRef>false</linkXRef>
+                    <configLocation>src/build/checkstyle.xml</configLocation>
                 </configuration>
                 <reportSets>
                     <!-- reportSet par défaut, exécuté dans tous les modules (non-aggregate reports) -->

@@ -86,24 +86,24 @@ public interface ComptabiliteDao {
 
 	/**
 	 * Renvoie un bean de type {@link SequenceEcritureComptable} à partir du couple (code journal, année)
-	 * @param pCodeJournal
-	 * @param pAnnee
+	 * @param pCodeJournal : Le code du journal comptable
+	 * @param pAnnee : L'année de l'écriture comptable associée au code du journal comptable.
 	 * @return {@link SequenceEcritureComptable}
-	 * @throws NotFoundException
+	 * @throws NotFoundException Si la séquence écriture comptable n'a pas été trouvée.
 	 */
 	SequenceEcritureComptable getSequenceEcritureComptable(String pCodeJournal, Integer pAnnee) throws NotFoundException;
 
 	/**
 	 * Met à jour la table MYERP.sequence_ecriture_comptable en ajoutant une nouvelle séquence écriture comptable.
-	 * @param pCodeJournal
-	 * @param pSequenceEcritureComptable
+	 * @param pCodeJournal : Le code du journal comptable
+	 * @param pSequenceEcritureComptable : Un bean de type {@link SequenceEcritureComptable}
 	 */
 	void insertSequenceEcritureComptable(String pCodeJournal, SequenceEcritureComptable pSequenceEcritureComptable);
 
 	/**
 	 * Met à jour la table MYERP.sequence_ecriture_comptable en incrémentant la colonne derniere_valeur.
-	 * @param pCodeJournal
-	 * @param pSequenceEcritureComptable
+	 * @param pCodeJournal : Le code du journal comptable
+	 * @param pSequenceEcritureComptable : Un bean de type {@link SequenceEcritureComptable}
 	 */
 	void updateSequenceEcritureComptable(String pCodeJournal, SequenceEcritureComptable pSequenceEcritureComptable);
 }

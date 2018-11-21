@@ -19,18 +19,12 @@
 
     <!-- ===== General information ===== -->
     <name>${project.artifactId}</name>
+    <description>Module model qui comprend les beans de l'application.</description>
 
 
     <!-- =============================================================== -->
-    <!-- Distrubution management -->
+    <!-- Distribution management -->
     <!-- =============================================================== -->
-    <distributionManagement>
-        <site>
-            <id>site</id>
-            <name>site-doc</name>
-            <url>file://${basedir}/../target/site-doc/${project.artifactId}/</url>
-        </site>
-    </distributionManagement>
 
 
     <!-- =============================================================== -->

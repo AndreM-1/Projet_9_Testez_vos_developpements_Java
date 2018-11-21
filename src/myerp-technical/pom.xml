@@ -19,18 +19,12 @@
 
     <!-- ===== General information ===== -->
     <name>${project.artifactId}</name>
-
+	<description>Module technical qui comprend les classes d'exceptions personnalisées ainsi que la configuration pour les logs d'erreurs.</description>
 
     <!-- =============================================================== -->
-    <!-- Distrubution management -->
+    <!-- Distribution management -->
     <!-- =============================================================== -->
-    <distributionManagement>
-        <site>
-            <id>site</id>
-            <name>site-doc</name>
-            <url>file://${basedir}/../target/site-doc/${project.artifactId}/</url>
-        </site>
-    </distributionManagement>
+
 
 
     <!-- =============================================================== -->

@@ -15,7 +15,7 @@ public class JournalComptableRM implements RowMapper<JournalComptable> {
     @Override
     public JournalComptable mapRow(ResultSet pRS, int pRowNum) throws SQLException {
     	//Correction André Monnier : Mise à jour et simplification du code.
-    	JournalComptable vBean = new JournalComptable(pRS.getString("code"),pRS.getString("libelle"));
+    	JournalComptable vBean = new JournalComptable(pRS.getString("code"), pRS.getString("libelle"));
         return vBean;
     }
 }

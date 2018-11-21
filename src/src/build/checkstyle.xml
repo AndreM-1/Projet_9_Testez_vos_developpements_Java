@@ -87,7 +87,7 @@
         <module name="LineLength">
             <metadata name="net.sf.eclipsecs.core.comment" value="FORMATAGE_CODE"/>
             <property name="id" value="FORMATAGE_CODE"/>
-            <property name="severity" value="error"/>
+            <property name="severity" value="warning"/>
             <property name="ignorePattern" value="^import\s"/>
             <property name="max" value="120"/>
             <property name="tabWidth" value="4"/>
@@ -95,7 +95,7 @@
         <module name="WhitespaceAround">
             <metadata name="net.sf.eclipsecs.core.comment" value="FORMATAGE_CODE"/>
             <property name="id" value="FORMATAGE_CODE"/>
-            <property name="severity" value="error"/>
+            <property name="severity" value="info"/>
             <property name="tokens"
                       value="ASSIGN,BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,DO_WHILE,EQUAL,GE,GT,LAND,LE,LITERAL_ASSERT,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,LT,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,NOT_EQUAL,PLUS,PLUS_ASSIGN,QUESTION,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN,TYPE_EXTENSION_AND"/>
         </module>
@@ -123,33 +123,22 @@
         <module name="WhitespaceAfter">
             <metadata name="net.sf.eclipsecs.core.comment" value="FORMATAGE_CODE"/>
             <property name="id" value="FORMATAGE_CODE"/>
-            <property name="severity" value="error"/>
+            <property name="severity" value="info"/>
             <property name="tokens" value="COMMA"/>
         </module>
         <module name="Indentation">
             <metadata name="net.sf.eclipsecs.core.comment" value="FORMATAGE_CODE"/>
             <property name="id" value="FORMATAGE_CODE"/>
-            <property name="severity" value="error"/>
+            <property name="severity" value="warning"/>
             <property name="basicOffset" value="4"/>
             <property name="caseIndent" value="4"/>
             <property name="lineWrappingIndentation" value="0"/>
         </module>
-        <module name="RegexpSinglelineJava">
-            <metadata name="net.sf.eclipsecs.core.comment" value="FORMATAGE_CODE"/>
-            <property name="id" value="FORMATAGE_CODE"/>
-            <property name="message" value="Utiliser des espaces pour l''indentation."/>
-            <property name="severity" value="error"/>
-            <property name="format" value="^ *\t+"/>
-        </module>
-
-
         <module name="NeedBraces">
             <metadata name="net.sf.eclipsecs.core.comment" value="BLOC_ACCOL_OBLIG"/>
             <property name="severity" value="warning"/>
             <property name="id" value="BLOC_ACCOL_OBLIG"/>
         </module>
-
-
         <module name="RegexpSinglelineJava">
             <metadata name="net.sf.eclipsecs.core.comment" value="NBR_INSTR_LIGNE"/>
             <property name="id" value="NBR_INSTR_LIGNE"/>
@@ -195,7 +184,7 @@
         <module name="JavadocMethod">
             <metadata name="net.sf.eclipsecs.core.comment" value="FORMAT_JAVADOC"/>
             <property name="id" value="FORMAT_JAVADOC"/>
-            <property name="severity" value="error"/>
+            <property name="severity" value="warning"/>
             <property name="allowUndeclaredRTE" value="true"/>
             <property name="allowThrowsTagsForSubclasses" value="true"/>
             <property name="allowMissingPropertyJavadoc" value="true"/>
@@ -478,7 +467,7 @@
         <module name="MagicNumber">
             <metadata name="net.sf.eclipsecs.core.comment" value="NUMERIC_CONST_OBLIG"/>
             <property name="id" value="NUMERIC_CONST_OBLIG"/>
-            <property name="severity" value="error"/>
+            <property name="severity" value="warning"/>
             <property name="ignoreNumbers" value="-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"/>
             <property name="ignoreAnnotation" value="true"/>
         </module>
