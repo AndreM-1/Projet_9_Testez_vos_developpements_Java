@@ -15,14 +15,24 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jdbc.datasource.init.ScriptException;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.dummy.myerp.consumer.ConsumerHelper;
 import com.dummy.myerp.consumer.dao.contrat.DaoProxy;
@@ -35,6 +45,7 @@ import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
 import com.dummy.myerp.model.bean.comptabilite.LigneEcritureComptable;
 import com.dummy.myerp.model.bean.comptabilite.SequenceEcritureComptable;
 import com.dummy.myerp.technical.exception.NotFoundException;
+import com.dummy.myerp.technical.exception.TechnicalException;
 
 /**
  * Classe permettant d'effectuer des tests unitaires sur la classe {@link ComptabiliteDaoImpl}
@@ -44,7 +55,9 @@ import com.dummy.myerp.technical.exception.NotFoundException;
 public class ComptabiliteDaoImplTest {
 
 	private static EmbeddedDatabase embeddedDatabase;
+	private static PlatformTransactionManager platformTransactionManager;
 	private static DataSource dataSourceEDB;
+	private static final String[] TABNOMTABLESBDD= {"myerp.ligne_ecriture_comptable","myerp.ecriture_comptable","myerp.sequence_ecriture_comptable","myerp.compte_comptable","myerp.journal_comptable"};
 	private static ComptabiliteDaoImpl comptabiliteDaoImpl;
 	private static List<CompteComptable> listCompteComptableExpected = new ArrayList<CompteComptable>();
 	private static List<JournalComptable> listJournalComptableExpected = new ArrayList<JournalComptable>();
@@ -65,6 +78,7 @@ public class ComptabiliteDaoImplTest {
 				.build(); 
 
 		dataSourceEDB=embeddedDatabase;
+		platformTransactionManager=new DataSourceTransactionManager(dataSourceEDB);
 
 		//Implémentation de la Map<DataSourcesEnum, DataSource>. On ne met que la
 		//DataSourcesEnum et la DateSource dont on a besoin.
@@ -84,7 +98,7 @@ public class ComptabiliteDaoImplTest {
 		createListCompteComptableExpected();
 		createListJournalComptableExpected();
 		createListLigneEcritureComptableExpected();
-		createEcritureComptableExpected();
+		updateEcritureComptableExpected();
 
 		//Configuration du daoProxy.
 		ConsumerHelper.configure(daoProxyMock);
@@ -92,11 +106,45 @@ public class ComptabiliteDaoImplTest {
 
 	}
 
+	@After
+	public void tearDown() throws Exception {
+	
+		TransactionStatus vTS = platformTransactionManager.getTransaction(new DefaultTransactionDefinition());
+		JdbcTemplate vJdbcTemplate = new JdbcTemplate(dataSourceEDB);
+		
+		//On efface les tables de la base de données.
+		for(String str:TABNOMTABLESBDD) {
+			String vSQL= "DELETE FROM "+ str;
+			try {
+				vJdbcTemplate.update(vSQL);
+			} catch (DataAccessException e) {
+				platformTransactionManager.rollback(vTS);
+				throw new TechnicalException("Erreur d'accès à la base de données");
+			}
+		}
+		
+		//On remplit les tables de la base de données avec les données initiales du jeu de démo.
+		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+		
+		try {
+			populator.addScripts(new ClassPathResource("21_insert_data_demo_test_unitaires.sql"));
+			populator.execute(dataSourceEDB);
+			platformTransactionManager.commit(vTS); 
+		} catch (ScriptException e) {
+			platformTransactionManager.rollback(vTS);
+			throw new TechnicalException("Erreur d'accès à la base de données");
+		}
+		
+		//Après chaque test, on remet à jour ecritureComptableExpected.
+		updateEcritureComptableExpected();
+	}
+
+	
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		embeddedDatabase.shutdown();
 	}
-
+	
 	/**
 	 * Construction de la liste de CompteComptable attendu.
 	 */
@@ -123,7 +171,7 @@ public class ComptabiliteDaoImplTest {
 	/**
 	 * Construction de l'EcritureComptable attendu. On a choisi l'EcritureComptable avec l'id=-1.
 	 */
-	private static void createEcritureComptableExpected() { 
+	private static void updateEcritureComptableExpected() { 
 		ecritureComptableExpected.setId(-1);
 		ecritureComptableExpected.setJournal(new JournalComptable("AC", "Achat"));
 		ecritureComptableExpected.setReference("AC-2016/00001");
@@ -136,6 +184,7 @@ public class ComptabiliteDaoImplTest {
 		ecritureComptableExpected.setDate(vCalendar.getTime());
 
 		ecritureComptableExpected.setLibelle("Cartouches d’imprimante");
+		ecritureComptableExpected.getListLigneEcriture().clear();
 		ecritureComptableExpected.getListLigneEcriture().addAll(listLigneEcritureComptableExpected);
 	}
 
@@ -448,6 +497,11 @@ public class ComptabiliteDaoImplTest {
 		comptabiliteDaoImpl.updateEcritureComptable(vEcritureComptableExpected);
 
 		//On fait plusieurs vérifications pour voir si l'update du bean EcritureComptable en base de données a bien réussi.
+		List<EcritureComptable> listEcritureComptableBDDEmbarque=comptabiliteDaoImpl.getListEcritureComptable();
+		
+		//On vérifie que la taille de listEcritureComptableBDDEmbarque est bien égal à tailleListEcritureComptableBDD. 
+		assertEquals("La taille de la liste d'EcritureComptable retournée n'est pas correcte.",tailleListEcritureComptableBDD,listEcritureComptableBDDEmbarque.size());
+		
 		//On vérifie que l'on arrive bien à récupérer l'EcritureComptable modifié à partir de son id ou de sa référence.
 		EcritureComptable ecritureComptableBDDEmbarqueById=comptabiliteDaoImpl.getEcritureComptable(vEcritureComptableExpected.getId());
 		EcritureComptable ecritureComptableBDDEmbarqueByRef=comptabiliteDaoImpl.getEcritureComptableByRef(vEcritureComptableExpected.getReference());
@@ -467,8 +521,12 @@ public class ComptabiliteDaoImplTest {
 		//On fait appel à la méthode que l'on veut tester.
 		//On va supprimer l'EcritureComptable d'id=-5.
 		comptabiliteDaoImpl.deleteEcritureComptable(-5);
-
-		tailleListEcritureComptableBDD-=1;
+		
+		//On fait plusieurs vérifications pour voir si la suppression du bean EcritureComptable en base de données a bien réussie.
+		List<EcritureComptable> listEcritureComptableBDDEmbarque=comptabiliteDaoImpl.getListEcritureComptable();
+		
+		//On vérifie que la taille de listEcritureComptableBDDEmbarque est bien égal à tailleListEcritureComptableBDD-1. 
+		assertEquals("La taille de la liste d'EcritureComptable retournée n'est pas correcte.",tailleListEcritureComptableBDD-1,listEcritureComptableBDDEmbarque.size());
 
 		//Ensuite, on essaie de récupérer l'EcritureComptable que l'on a supprimée.
 		//On s'attend à lever une NotFoundException.
