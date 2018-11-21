@@ -1,5 +1,7 @@
 # MyERP
 
+[![Build Status](https://travis-ci.org/AndreM-1/Projet_9_Testez_vos_developpements_Java.svg?branch=master)](https://travis-ci.org/AndreM-1/Projet_9_Testez_vos_developpements_Java)
+
 ## Organisation du répertoire
 
 *   `doc` : documentation
